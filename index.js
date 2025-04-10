@@ -1,11 +1,20 @@
+const express = require('express');
 const { Server } = require("socket.io");
 
-const io = new Server(3000, {
+const app = express();
+const server = app.listen(3000, () => {
+  console.log("Signaling server running on http://localhost:3000");
+});
+
+// Serve static files (like your HTML file)
+app.use(express.static('public'));  // assuming your HTML file is in a 'public' folder
+
+const io = new Server(server, {
   cors: {
-    origin: "*", // Allow connections from any origin
+    origin: "*",  // Allow connections from any origin
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
-    credentials: true, // Allow cookies if needed
+    credentials: true,  // Allow cookies if needed
   },
 });
 
@@ -45,5 +54,3 @@ io.on("connection", (socket) => {
     io.to(to).emit("peer:nego:final", { from: socket.id, ans });
   });
 });
-
-console.log('Signaling server running on http://localhost:3000');
