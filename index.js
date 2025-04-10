@@ -29,6 +29,7 @@ io.on("connection", (socket) => {
     console.log(`User with email ${email} joined room ${room}`);
     emailToSocketIdMap.set(email, socket.id);
     socketidToEmailMap.set(socket.id, email);
+    socket.join(room);
     io.to(room).emit("user:joined", { email, id: socket.id });
     socket.join(room);
     io.to(socket.id).emit("room:join", data);
@@ -53,4 +54,12 @@ io.on("connection", (socket) => {
     console.log("peer:nego:done", ans);
     io.to(to).emit("peer:nego:final", { from: socket.id, ans });
   });
+
+  // End call event
+  socket.on("end:call", ({ to }) => {
+    console.log(`Ending call from ${socket.id}`);
+    io.to(to).emit("call:ended", { from: socket.id });
+  });
 });
+
+console.log("Signaling server running on http://localhost:3000");
